@@ -8,8 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 import Menu from "../components/Menu";
-
 import AddIcon from "@mui/icons-material/Add";
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useEffect, useState } from "react";
 import { auth, db } from "../components/firebase";
 import {
@@ -23,6 +23,7 @@ import {
   where,
 } from "firebase/firestore";
 import NewCustomer from "../components/NewCustomer";
+import { MessageSquare, SquarePen, Trash2 } from "lucide-react";
 
 export type Customer = {
   id: string;
@@ -139,6 +140,32 @@ function Clientes() {
     setOpenDialog(false);
   }
 
+  const inputStyle = {
+    mb: 2,
+    width: "100%",
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "10px",
+      backgroundColor: "#f3f4f6",
+      height: 40,
+
+      "& fieldset": {
+        border: "1px solid #e5e7eb",
+      },
+
+      "&:hover fieldset": {
+        borderColor: "#d1d5db",
+      },
+
+      "&.Mui-focused fieldset": {
+        borderColor: "#3b82f6",
+      },
+    },
+
+    "& input": {
+      padding: "4px 12px",
+    },
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <Box>
@@ -187,33 +214,118 @@ function Clientes() {
           </Box>
         </Box>
         <Box>
-          <Paper elevation={3}>
-            <Box sx={{ padding: 2 }}>
+          <Paper elevation={2} sx={{ border: "1px solid #e5e5e5" }}>
+            <Box sx={{ padding: 2, paddingBottom: 0 }}>
               <TextField
+                sx={inputStyle}
                 fullWidth
                 placeholder="Buscar por nome ou telefone..."
               />
             </Box>
-            <Box>
+            <Box sx={{ paddingBottom: 1 }}>
               <Grid>
                 {customer.map((customer) => (
                   <Grid key={customer.id}>
-                    <Paper sx={{ padding: 3, borderRadius: 2, mb: 2, mx: 2 }}>
-                      <Box sx={{ display: "flex" }}>
-                        <Box></Box>
-                        <Box>
-                          <Typography>{customer.name}</Typography>
-                          <Typography>{customer.number}</Typography>
-                          <Typography>{customer.email}</Typography>
+                    <Paper
+                      sx={{
+                        padding: 2,
+                        borderRadius: 2,
+                        mb: 2,
+                        mx: 2,
+                        border: "1px solid #e5e5e5",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", gap: 2 }}>
+                        <Box
+                          sx={{
+                            color: "#155dfc",
+                            backgroundColor: "#dbeafe",
+                            height: 48,
+                            width: 48,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 10,
+                          }}
+                        >
+                          <PersonOutlinedIcon sx={{ fontSize: 30 }} />
                         </Box>
-                        <Box>
-                          <IconButton></IconButton>
+                        <Box sx={{ width: 1200 }}>
+                          <Typography
+                            sx={{ fontSize: 20, fontWeight: 550, mb: "4px" }}
+                          >
+                            {customer.name}
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#6b7280", fontSize: 15, mb: "4px" }}
+                          >
+                            📞 {customer.number}
+                          </Typography>
+                          <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
+                            ✉️ {customer.email}
+                          </Typography>
+                          {customer.notes?.trim() && (
+                            <Typography
+                              sx={{
+                                backgroundColor: "#fffbeb",
+                                border: "1px solid #fee685",
+                                borderRadius: 1,
+                                padding: 1,
+                                mt: 1,
+                                display: "flex",
+                                fontSize: 15,
+                              }}
+                            >
+                              <Box sx={{ fontWeight: 550 }}>Observações:</Box>{" "}
+                              {customer.notes}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "right",
+                            gap: 1,
+                          }}
+                        >
                           <IconButton
+                            sx={{
+                              color: "#000000c0",
+                              border: "1px solid #e5e5e5",
+                              borderRadius: 2,
+                              height: 35,
+                              gap: 1,
+                              fontSize: 15,
+                              fontWeight: 550,
+                            }}
+                          >
+                            <MessageSquare />
+                            Whatsapp
+                          </IconButton>
+                          <IconButton
+                            sx={{
+                              color: "#000000c0",
+                              border: "1px solid #e5e5e5",
+                              borderRadius: 2,
+                              height: 35,
+                              width: 40,
+                            }}
                             onClick={() => handleEdit(customer)}
-                          ></IconButton>
+                          >
+                            <SquarePen />
+                          </IconButton>
                           <IconButton
+                            sx={{
+                              color: "#ff0000c0",
+                              border: "1px solid #e5e5e5",
+                              borderRadius: 2,
+                              height: 35,
+                              width: 40,
+                            }}
                             onClick={() => deleteCustomer(customer.id)}
-                          ></IconButton>
+                          >
+                            <Trash2 />
+                          </IconButton>
                         </Box>
                       </Box>
                     </Paper>

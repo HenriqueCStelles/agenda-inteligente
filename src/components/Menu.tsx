@@ -31,7 +31,6 @@ function Menu() {
   async function handleLogout() {
     try {
       await signOut(auth);
-
       navigate("/login");
     } catch (error) {
       console.error("Erro ao sair:", error);

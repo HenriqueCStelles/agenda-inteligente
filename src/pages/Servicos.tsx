@@ -26,8 +26,7 @@ import {
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CardTravelOutlinedIcon from "@mui/icons-material/CardTravelOutlined";
-import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
+import { SquarePen, Trash2 } from "lucide-react";
 
 export type Service = {
   id: string;
@@ -195,8 +194,13 @@ function Servicos() {
             {service.map((service) => (
               <Grid key={service.id}>
                 <Paper
-                  elevation={3}
-                  sx={{ width: 450, padding: 3, borderRadius: 5 }}
+                  elevation={2}
+                  sx={{
+                    width: 450,
+                    padding: 3,
+                    borderRadius: 5,
+                    border: "1px solid #e5e5e5",
+                  }}
                 >
                   <Box
                     sx={{
@@ -221,13 +225,13 @@ function Servicos() {
                     </Box>
                     <Box>
                       <IconButton onClick={() => handleEdit(service)}>
-                        <EditNoteOutlinedIcon />
+                        <SquarePen />
                       </IconButton>
                       <IconButton
-                        sx={{ color: "#ff0000" }}
+                        sx={{ color: "#ff0000c4" }}
                         onClick={() => deleteService(service.id)}
                       >
-                        <DeleteForeverOutlinedIcon />
+                        <Trash2 />
                       </IconButton>
                     </Box>
                   </Box>

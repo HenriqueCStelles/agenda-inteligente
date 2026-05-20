@@ -62,7 +62,7 @@ function NewCustomer({
   }, [editingCustomer]);
 
   async function handleSave() {
-    if (!name.trim() || !number.trim() || !email.trim() || !notes.trim()) {
+    if (!name.trim() || !number.trim() || !email.trim()) {
       return alert("Preencha todos os campos!");
     }
     try {
@@ -134,6 +134,7 @@ function NewCustomer({
             type="text"
             variant="outlined"
             placeholder="Nome do cliente"
+            required
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
@@ -142,6 +143,8 @@ function NewCustomer({
             sx={inputStyle}
             variant="outlined"
             placeholder="(00)00000-0000"
+            required
+            slotProps={{ htmlInput: { maxLength: 13 } }}
             value={number}
             onChange={(event) => setNumber(event.target.value)}
           />
@@ -151,6 +154,7 @@ function NewCustomer({
             type="email"
             variant="outlined"
             placeholder="cliente@email.com"
+            required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />

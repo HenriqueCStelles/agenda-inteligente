@@ -3,7 +3,7 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { auth } from "./components/firebase";
 
@@ -31,6 +31,7 @@ function PrivateRoute({ children }: Props) {
   }
 
   if (!user) {
+    signOut(auth);
     return <Navigate to="/login" replace />;
   }
 
