@@ -3,6 +3,7 @@ import {
   Button,
   Grid,
   IconButton,
+  InputAdornment,
   Paper,
   TextField,
   Typography,
@@ -24,6 +25,7 @@ import {
 } from "firebase/firestore";
 import NewCustomer from "../components/NewCustomer";
 import { MessageSquare, SquarePen, Trash2 } from "lucide-react";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 export type Customer = {
   id: string;
@@ -157,7 +159,7 @@ function Clientes() {
       },
 
       "&.Mui-focused fieldset": {
-        borderColor: "#3b82f6",
+        borderColor: "#5c5b5baf",
       },
     },
 
@@ -214,11 +216,20 @@ function Clientes() {
           </Box>
         </Box>
         <Box>
-          <Paper elevation={2} sx={{ border: "1px solid #e5e5e5" }}>
+          <Paper elevation={0} sx={{ border: "1px solid #e5e5e5" }}>
             <Box sx={{ padding: 2, paddingBottom: 0 }}>
               <TextField
                 sx={inputStyle}
                 fullWidth
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchOutlinedIcon sx={{ color: "#abafb4" }} />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
                 placeholder="Buscar por nome ou telefone..."
               />
             </Box>
