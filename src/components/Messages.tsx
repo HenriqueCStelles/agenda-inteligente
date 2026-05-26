@@ -1,6 +1,56 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { auth, db } from "./firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 function Messages() {
+  const [dailyMessage, setDailyMessage] = useState("");
+  const [customerMessage, setCustomerMessage] = useState("");
+
+  async function saveConfig() {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        return alert("usuario nao autenticado");
+      }
+      const messages = {
+        dailyMessage,
+        customerMessage,
+        updatedAt: new Date(),
+      };
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          messages,
+        },
+        { merge: true },
+      );
+      console.log("Mensagens salvas com sucesso");
+    } catch (error) {
+      console.error("Erro ao salvar mensagens:", error);
+    }
+  }
+
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return;
+        const data = docSnap.data();
+        const messages = data.messages;
+        if (!messages) return;
+        setDailyMessage(messages.dailyMessage || "");
+        setCustomerMessage(messages.customerMessage || "");
+      } catch (error) {
+        console.error("Erro ao carregar configurações:", error);
+      }
+    }
+    loadConfig();
+  }, []);
+
   return (
     <Box>
       <Paper
@@ -47,6 +97,8 @@ function Messages() {
             type="text"
             variant="outlined"
             placeholder="Mensagem da Agenda Diária"
+            value={dailyMessage}
+            onChange={(event) => setDailyMessage(event.target.value)}
             multiline
             rows={2}
           />
@@ -58,6 +110,7 @@ function Messages() {
             backgroundColor: "#000",
             borderRadius: 2,
           }}
+          onClick={saveConfig}
         >
           Salvar
         </Button>
@@ -104,6 +157,8 @@ function Messages() {
             type="text"
             variant="outlined"
             placeholder="Mensagem de Lembrete aos Clientes"
+            value={customerMessage}
+            onChange={(event) => setCustomerMessage(event.target.value)}
             multiline
             rows={2}
           />
@@ -115,6 +170,7 @@ function Messages() {
             backgroundColor: "#000",
             borderRadius: 2,
           }}
+          onClick={saveConfig}
         >
           Salvar
         </Button>

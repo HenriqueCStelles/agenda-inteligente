@@ -6,8 +6,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import { auth, db } from "./firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 function Automation() {
+  const [dailyScheduleTime, setDailyScheduleTime] = useState("");
+  const [dailyCustomerRemind, setDailyCustomerRemind] = useState("");
   const inputStyle = {
     width: "100%",
     "& .MuiOutlinedInput-root": {
@@ -32,6 +37,51 @@ function Automation() {
       padding: "4px 12px",
     },
   };
+
+  async function saveConfig() {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        return alert("usuario nao autenticado");
+      }
+      const remindsTime = {
+        dailyScheduleTime,
+        dailyCustomerRemind,
+        updatedAt: new Date(),
+      };
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          remindsTime,
+        },
+        { merge: true },
+      );
+      console.log("Horários salvos com sucesso");
+    } catch (error) {
+      console.error("Erro ao salvar horários:", error);
+    }
+  }
+
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return;
+        const data = docSnap.data();
+        const remindsTime = data.remindsTime;
+        if (!remindsTime) return;
+        setDailyScheduleTime(remindsTime.dailyScheduleTime || "");
+        setDailyCustomerRemind(remindsTime.dailyCustomerRemind || "");
+      } catch (error) {
+        console.error("Erro ao carregar configurações:", error);
+      }
+    }
+    loadConfig();
+  }, []);
+
   return (
     <Box>
       <Paper
@@ -57,7 +107,12 @@ function Automation() {
             <Typography sx={{ fontWeight: 550, fontSize: 14 }}>
               Horário de envio da adenda diária
             </Typography>
-            <TextField sx={inputStyle} type="time" />
+            <TextField
+              sx={inputStyle}
+              type="time"
+              value={dailyScheduleTime}
+              onChange={(event) => setDailyScheduleTime(event.target.value)}
+            />
             <Typography sx={{ color: "#6b7280", fontSize: 13 }}>
               Agenda será enviada ao profissional neste horário
             </Typography>
@@ -66,7 +121,12 @@ function Automation() {
             <Typography sx={{ fontWeight: 550, fontSize: 14 }}>
               Horário de envio dos lembretes aos clientes
             </Typography>
-            <TextField sx={inputStyle} type="time" />
+            <TextField
+              sx={inputStyle}
+              type="time"
+              value={dailyCustomerRemind}
+              onChange={(event) => setDailyCustomerRemind(event.target.value)}
+            />
             <Typography sx={{ color: "#6b7280", fontSize: 13 }}>
               Lembretes serão enviados após confirmação da agenda
             </Typography>
@@ -104,6 +164,7 @@ function Automation() {
             backgroundColor: "#000",
             borderRadius: 2,
           }}
+          onClick={saveConfig}
         >
           Salvar Configurações
         </Button>

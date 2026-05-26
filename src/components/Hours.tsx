@@ -8,17 +8,107 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { auth, db } from "./firebase";
+
+type Day =
+  | "Segunda"
+  | "Terça"
+  | "Quarta"
+  | "Quinta"
+  | "Sexta"
+  | "Sábado"
+  | "Domingo";
+
+const diasSemana: Day[] = [
+  "Domingo",
+  "Segunda",
+  "Terça",
+  "Quarta",
+  "Quinta",
+  "Sexta",
+  "Sábado",
+];
+const initialDays = {
+  Segunda: false,
+  Terça: false,
+  Quarta: false,
+  Quinta: false,
+  Sexta: false,
+  Sábado: false,
+  Domingo: false,
+};
 
 function Hours() {
-  const diasSemana = [
-    "Domingo",
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado",
-  ];
+  const [days, setDays] = useState<Record<Day, boolean>>(initialDays);
+  const [openTime, setOpenTime] = useState("");
+  const [closeTime, setCloseTime] = useState("");
+  const [breakTime, setBreakTime] = useState<number>(0);
+
+  const handleChange =
+    (day: Day) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setDays((prev) => ({
+        ...prev,
+        [day]: event.target.checked,
+      }));
+    };
+
+  async function saveConfig() {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        return alert("usuario nao autenticado");
+      }
+      const activeDays = (Object.keys(days) as Day[]).filter(
+        (day) => days[day],
+      );
+      const workingHours = {
+        days: activeDays,
+        openTime,
+        closeTime,
+        breakTime,
+        updatedAt: new Date(),
+      };
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          workingHours,
+        },
+        { merge: true },
+      );
+      console.log("Horários salvos com sucesso");
+    } catch (error) {
+      console.error("Erro ao salvar horários:", error);
+    }
+  }
+
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return;
+        const data = docSnap.data();
+        const workingHours = data.workingHours;
+        if (!workingHours) return;
+        const loadedDays = { ...initialDays };
+        workingHours.days.forEach((day: Day) => {
+          loadedDays[day] = true;
+        });
+        setDays(loadedDays);
+        setOpenTime(workingHours.openTime || "");
+        setCloseTime(workingHours.closeTime || "");
+        setBreakTime(workingHours.breakTime || 0);
+      } catch (error) {
+        console.error("Erro ao carregar configurações:", error);
+      }
+    }
+    loadConfig();
+  }, []);
+
   const inputStyle = {
     mb: 2,
     width: "100%",
@@ -65,10 +155,27 @@ function Hours() {
         </Box>
         <Box sx={{ mb: 2 }}>
           <Typography sx={{ fontWeight: 550 }}>Dias de atendimento</Typography>
-          <Grid container spacing={2} mb={4}>
-            {diasSemana.map((dia) => (
-              <Grid item xs={12} md={3} key={dia}>
-                <FormControlLabel control={<Switch />} label={dia} />
+          <Grid container spacing={2}>
+            {diasSemana.map((day) => (
+              <Grid key={day}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      sx={{
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "#000",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                          {
+                            backgroundColor: "#000000",
+                          },
+                      }}
+                      checked={days[day]}
+                      onChange={handleChange(day)}
+                    />
+                  }
+                  label={day}
+                />
               </Grid>
             ))}
           </Grid>
@@ -84,13 +191,23 @@ function Hours() {
             <Typography sx={{ fontWeight: 550, fontSize: 14 }}>
               Horário de início
             </Typography>
-            <TextField sx={inputStyle} type="time" />
+            <TextField
+              sx={inputStyle}
+              type="time"
+              value={openTime}
+              onChange={(event) => setOpenTime(event.target.value)}
+            />
           </Box>
           <Box>
             <Typography sx={{ fontWeight: 550, fontSize: 14 }}>
               Horário de término
             </Typography>
-            <TextField sx={inputStyle} type="time" />
+            <TextField
+              sx={inputStyle}
+              type="time"
+              value={closeTime}
+              onChange={(event) => setCloseTime(event.target.value)}
+            />
           </Box>
           <Box>
             <Typography sx={{ fontWeight: 550, fontSize: 14 }}>
@@ -99,7 +216,9 @@ function Hours() {
             <TextField
               sx={inputStyle}
               type="number"
+              value={breakTime}
               slotProps={{ htmlInput: { maxLength: 2 } }}
+              onChange={(event) => setBreakTime(Number(event.target.value))}
             />
           </Box>
         </Box>
@@ -110,6 +229,7 @@ function Hours() {
             backgroundColor: "#000",
             borderRadius: 2,
           }}
+          onClick={saveConfig}
         >
           Salvar Horários
         </Button>

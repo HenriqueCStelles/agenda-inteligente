@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Grid,
+  IconButton,
   InputAdornment,
   MenuItem,
   Paper,
@@ -13,10 +14,35 @@ import Menu from "../components/Menu";
 
 import AddIcon from "@mui/icons-material/Add";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import NewSchedule from "../components/NewSchedule";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { auth, db } from "../components/firebase";
+import { MessageSquare, SquarePen, Trash2 } from "lucide-react";
+
+export type Schedule = {
+  id: string;
+  customer: string;
+  service: string;
+  date: string;
+  time: string;
+  notes: string;
+};
 
 function Agendamentos() {
   const [status, setStatus] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [schedule, setSchedule] = useState<Schedule[]>([]);
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
   const inputStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
@@ -41,6 +67,113 @@ function Agendamentos() {
       padding: "4px 12px",
     },
   };
+
+  useEffect(() => {
+    async function fetchSchedule() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const q = query(
+          collection(db, "schedules"),
+          where("userId", "==", user.uid),
+        );
+        const querySnapshot = await getDocs(q);
+        const scheduleData: Schedule[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Schedule, "id">),
+        }));
+        setSchedule(scheduleData);
+      } catch (error) {
+        console.error("erro ao buscar clientes:", error);
+      }
+    }
+    fetchSchedule();
+  }, []);
+
+  async function addSchedule(
+    customer: string,
+    service: string,
+    date: string,
+    time: string,
+    notes: string,
+  ) {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        return alert("usuario nao autenticado");
+      }
+      const docRef = await addDoc(collection(db, "schedules"), {
+        customer,
+        service,
+        date,
+        time,
+        notes,
+        userId: user.uid,
+      });
+      const newSchedule = {
+        id: docRef.id,
+        customer,
+        service,
+        date,
+        time,
+        notes,
+        userId: user.uid,
+      };
+      setSchedule((prev) => [...prev, newSchedule]);
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("erro ao adicionar agendamento:", error);
+    }
+  }
+
+  async function updateSchedule(
+    id: string,
+    customer: string,
+    service: string,
+    date: string,
+    time: string,
+    notes: string,
+  ) {
+    try {
+      const scheduleRef = doc(db, "schedules", id);
+      await updateDoc(scheduleRef, { customer, service, date, time, notes });
+      setSchedule((prev) =>
+        prev.map((schedule) =>
+          schedule.id === id
+            ? { ...schedule, customer, service, date, time, notes }
+            : schedule,
+        ),
+      );
+      setEditingSchedule(null);
+    } catch (error) {
+      console.error("Erro ao atualizar cliente:", error);
+    }
+  }
+
+  async function deleteSchedule(id: string) {
+    const confirmDelete = window.confirm("Deseja deletar este agendamento?");
+    if (!confirmDelete) return;
+    try {
+      await deleteDoc(doc(db, "schedules", id));
+      setSchedule((prev) => prev.filter((schedule) => schedule.id !== id));
+    } catch (error) {
+      console.log("Erro ao deletar agendamento:", error);
+    }
+  }
+
+  function handleEdit(schedule: Schedule) {
+    setEditingSchedule(schedule);
+    setOpenDialog(true);
+  }
+
+  function handleOpen() {
+    setOpenDialog(true);
+  }
+
+  function handleClose() {
+    setOpenDialog(false);
+  }
+
   return (
     <Box sx={{ display: "flex" }}>
       <Box>
@@ -80,6 +213,7 @@ function Agendamentos() {
                   borderRadius: 3,
                   fontWeight: 550,
                 }}
+                onClick={() => handleOpen()}
               >
                 <AddIcon />
                 Novo Agendamento
@@ -88,7 +222,10 @@ function Agendamentos() {
           </Box>
         </Box>
         <Box>
-          <Paper elevation={0} sx={{ border: "1px solid #e5e5e5" }}>
+          <Paper
+            elevation={0}
+            sx={{ border: "1px solid #e5e5e5", borderRadius: 2 }}
+          >
             <Box sx={{ padding: 2, paddingBottom: 0, display: "flex", gap: 1 }}>
               <TextField
                 sx={{ ...inputStyle, width: "80%" }}
@@ -130,11 +267,135 @@ function Agendamentos() {
               </Select>
             </Box>
             <Box sx={{ paddingBottom: 1 }}>
-              <Grid></Grid>
+              <Grid>
+                {schedule.map((schedule) => (
+                  <Grid key={schedule.id}>
+                    <Paper
+                      sx={{
+                        padding: 2,
+                        borderRadius: 2,
+                        mb: 2,
+                        mx: 2,
+                        border: "1px solid #e5e5e5",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", gap: 2 }}>
+                        <Box
+                          sx={{
+                            width: "6%",
+                            display: "flex",
+                            justifyContent: "center",
+                            borderRadius: 10,
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              sx={{
+                                color: "#6b7280",
+                                fontSize: 15,
+                              }}
+                            >
+                              {schedule.date}
+                            </Typography>
+
+                            <Typography
+                              sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                color: "#000000",
+                                fontSize: 20,
+                                fontWeight: 550,
+                              }}
+                            >
+                              {schedule.time}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box sx={{ width: 1200 }}>
+                          <Typography
+                            sx={{ fontSize: 20, fontWeight: 550, mb: "4px" }}
+                          >
+                            {schedule.customer}
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#6b7280", fontSize: 15, mb: "4px" }}
+                          >
+                            {schedule.service}
+                          </Typography>
+
+                          {schedule.notes?.trim() && (
+                            <Typography
+                              sx={{
+                                color: "#6b7280",
+                                fontSize: 15,
+                              }}
+                            >
+                              {schedule.notes}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "right",
+                            gap: 1,
+                          }}
+                        >
+                          <IconButton
+                            sx={{
+                              color: "#000000c0",
+                              border: "1px solid #e5e5e5",
+                              borderRadius: 2,
+                              height: 35,
+                              gap: 1,
+                              fontSize: 15,
+                              fontWeight: 550,
+                            }}
+                          >
+                            <MessageSquare />
+                            Whatsapp
+                          </IconButton>
+                          <IconButton
+                            sx={{
+                              color: "#000000c0",
+                              border: "1px solid #e5e5e5",
+                              borderRadius: 2,
+                              height: 35,
+                              width: 40,
+                            }}
+                            onClick={() => handleEdit(schedule)}
+                          >
+                            <SquarePen />
+                          </IconButton>
+                          <IconButton
+                            sx={{
+                              color: "#ff0000c0",
+                              border: "1px solid #e5e5e5",
+                              borderRadius: 2,
+                              height: 35,
+                              width: 40,
+                            }}
+                            onClick={() => deleteSchedule(schedule.id)}
+                          >
+                            <Trash2 />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
             </Box>
           </Paper>
         </Box>
       </Box>
+      <NewSchedule
+        open={openDialog}
+        onClose={handleClose}
+        addSchedule={addSchedule}
+        updateSchedule={updateSchedule}
+        editingSchedule={editingSchedule}
+      />
     </Box>
   );
 }

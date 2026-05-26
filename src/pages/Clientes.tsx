@@ -216,7 +216,10 @@ function Clientes() {
           </Box>
         </Box>
         <Box>
-          <Paper elevation={0} sx={{ border: "1px solid #e5e5e5" }}>
+          <Paper
+            elevation={0}
+            sx={{ border: "1px solid #e5e5e5", borderRadius: 2 }}
+          >
             <Box sx={{ padding: 2, paddingBottom: 0 }}>
               <TextField
                 sx={inputStyle}
