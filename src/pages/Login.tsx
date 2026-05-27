@@ -213,7 +213,11 @@ function Login() {
             <Button
               fullWidth
               variant="contained"
-              sx={{ borderRadius: "10px", fontWeight: 600 }}
+              sx={{
+                borderRadius: "10px",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
               disabled={loading}
               onClick={handleLogin}
             >

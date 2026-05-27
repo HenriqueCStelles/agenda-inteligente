@@ -163,6 +163,7 @@ function Automation() {
             color: "#fff",
             backgroundColor: "#000",
             borderRadius: 2,
+            textTransform: "none",
           }}
           onClick={saveConfig}
         >

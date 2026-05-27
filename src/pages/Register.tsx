@@ -252,6 +252,7 @@ function Register() {
               sx={inputStyle}
               variant="outlined"
               placeholder="(99)99999-9999"
+              slotProps={{ htmlInput: { maxLength: 13 } }}
               value={number}
               onChange={(event) => setNumber(event.target.value)}
             />
@@ -302,7 +303,11 @@ function Register() {
             <Button
               fullWidth
               variant="contained"
-              sx={{ borderRadius: "10px", fontWeight: 600 }}
+              sx={{
+                borderRadius: "10px",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
               disabled={loading}
               onClick={handleRegister}
             >

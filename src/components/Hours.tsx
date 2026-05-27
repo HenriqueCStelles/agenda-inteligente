@@ -228,6 +228,7 @@ function Hours() {
             color: "#fff",
             backgroundColor: "#000",
             borderRadius: 2,
+            textTransform: "none",
           }}
           onClick={saveConfig}
         >

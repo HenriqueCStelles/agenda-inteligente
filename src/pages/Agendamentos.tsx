@@ -195,7 +195,9 @@ function Agendamentos() {
               <Typography sx={{ fontSize: 30, fontWeight: 550 }}>
                 Agendamentos
               </Typography>
-              <Typography>Gerencie todos os agendamentos</Typography>
+              <Typography sx={{ color: "#6b7280" }}>
+                Gerencie todos os agendamentos
+              </Typography>
             </Box>
             <Box
               sx={{
@@ -212,6 +214,7 @@ function Agendamentos() {
                   px: 1,
                   borderRadius: 3,
                   fontWeight: 550,
+                  textTransform: "none",
                 }}
                 onClick={() => handleOpen()}
               >
@@ -326,11 +329,12 @@ function Agendamentos() {
                           {schedule.notes?.trim() && (
                             <Typography
                               sx={{
+                                fontStyle: "italic",
                                 color: "#6b7280",
                                 fontSize: 15,
                               }}
                             >
-                              {schedule.notes}
+                              📌 {schedule.notes}
                             </Typography>
                           )}
                         </Box>

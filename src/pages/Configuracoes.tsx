@@ -44,7 +44,9 @@ function Configuracoes() {
             <Typography sx={{ fontSize: 30, fontWeight: 550 }}>
               Configurações
             </Typography>
-            <Typography>Configure os parâmetros do sistema</Typography>
+            <Typography sx={{ color: "#6b7280" }}>
+              Configure os parâmetros do sistema
+            </Typography>
           </Box>
         </Box>
         <Box>

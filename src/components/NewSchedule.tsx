@@ -303,7 +303,12 @@ function NewSchedule({
         <Box sx={{ gap: 2, mt: 2, display: "flex", justifyContent: "right" }}>
           <Button
             variant="outlined"
-            sx={{ borderColor: "#d1d5db", color: "#000000", borderRadius: 2 }}
+            sx={{
+              borderColor: "#d1d5db",
+              color: "#000000",
+              borderRadius: 2,
+              textTransform: "none",
+            }}
             onClick={() => {
               onClose();
               resetFields();
@@ -313,7 +318,11 @@ function NewSchedule({
           </Button>
           <Button
             variant="contained"
-            sx={{ backgroundColor: "#000000", borderRadius: 2 }}
+            sx={{
+              backgroundColor: "#000000",
+              borderRadius: 2,
+              textTransform: "none",
+            }}
             onClick={handleSave}
           >
             {editingSchedule ? "Salvar Alterações" : "Salvar"}

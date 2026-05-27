@@ -109,6 +109,7 @@ function Messages() {
             color: "#fff",
             backgroundColor: "#000",
             borderRadius: 2,
+            textTransform: "none",
           }}
           onClick={saveConfig}
         >
@@ -169,6 +170,7 @@ function Messages() {
             color: "#fff",
             backgroundColor: "#000",
             borderRadius: 2,
+            textTransform: "none",
           }}
           onClick={saveConfig}
         >

@@ -163,7 +163,9 @@ function Servicos() {
               <Typography sx={{ fontSize: 30, fontWeight: 550 }}>
                 Serviços
               </Typography>
-              <Typography>Gerencie os serviços oferecidos</Typography>
+              <Typography sx={{ color: "#6b7280" }}>
+                Gerencie os serviços oferecidos
+              </Typography>
             </Box>
             <Box
               sx={{
@@ -180,6 +182,7 @@ function Servicos() {
                   px: 1,
                   borderRadius: 3,
                   fontWeight: 550,
+                  textTransform: "none",
                 }}
                 onClick={() => handleOpen()}
               >

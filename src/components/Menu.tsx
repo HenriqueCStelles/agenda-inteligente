@@ -158,7 +158,11 @@ function Menu() {
         </Box>
         <Divider />
         <Box sx={{ p: 2 }}>
-          <Button fullWidth sx={{ color: "#000000" }} onClick={handleLogout}>
+          <Button
+            fullWidth
+            sx={{ color: "#000000", textTransform: "none", gap: 1 }}
+            onClick={handleLogout}
+          >
             <LogoutOutlinedIcon />
             Sair
           </Button>
