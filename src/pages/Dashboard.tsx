@@ -2,10 +2,43 @@ import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import Menu from "../components/Menu";
 
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
+import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDate(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formattedDate = currentDate.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+
+  const paperStyle = {
+    padding: 2,
+    mb: 2,
+    border: "1px solid #e5e5e5",
+    borderRadius: 3,
+    width: "25%",
+  };
+  const titleBox = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <Box>
@@ -26,77 +59,53 @@ function Dashboard() {
             <Typography sx={{ fontSize: 30, fontWeight: 550 }}>
               Dashboard
             </Typography>
-            <Typography sx={{ color: "#6b7280" }}>
-              Configure os parâmetros do sistema
-            </Typography>
+            <Typography sx={{ color: "#6b7280" }}>{formattedDate}</Typography>
           </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              padding: 2,
-              mb: 2,
-              border: "1px solid #e5e5e5",
-              borderRadius: 3,
-              width: "25%",
-            }}
-          >
-            <Box>
+          <Paper elevation={0} sx={paperStyle}>
+            <Box sx={titleBox}>
               <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
                 Agendamentos Hoje
               </Typography>
+              <Box>
+                <CalendarTodayOutlinedIcon sx={{ color: "#6b7280" }} />
+              </Box>
             </Box>
             <Typography></Typography>
           </Paper>
-          <Paper
-            elevation={0}
-            sx={{
-              padding: 2,
-              mb: 2,
-              border: "1px solid #e5e5e5",
-              borderRadius: 3,
-              width: "25%",
-            }}
-          >
-            <Box>
+          <Paper elevation={0} sx={paperStyle}>
+            <Box sx={titleBox}>
               <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
                 Confirmados
               </Typography>
+              <Box>
+                <CheckCircleOutlineOutlinedIcon sx={{ color: "#00a63e" }} />
+              </Box>
             </Box>
             <Typography></Typography>
           </Paper>
-          <Paper
-            elevation={0}
-            sx={{
-              padding: 2,
-              mb: 2,
-              border: "1px solid #e5e5e5",
-              borderRadius: 3,
-              width: "25%",
-            }}
-          >
-            <Box>
+          <Paper elevation={0} sx={paperStyle}>
+            <Box sx={titleBox}>
               <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
                 Sem Resposta
               </Typography>
+              <Box>
+                <QueryBuilderIcon sx={{ color: "#f54a00" }} />
+              </Box>
             </Box>
             <Typography></Typography>
           </Paper>
-          <Paper
-            elevation={0}
-            sx={{
-              padding: 2,
-              mb: 2,
-              border: "1px solid #e5e5e5",
-              borderRadius: 3,
-              width: "25%",
-            }}
-          >
-            <Box>
+          <Paper elevation={0} sx={paperStyle}>
+            <Box sx={titleBox}>
               <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
                 Solicitações Pendentes
               </Typography>
+              <Box>
+                <ErrorOutlineOutlinedIcon
+                  sx={{ fontSize: 25, color: "#155dfc" }}
+                />
+              </Box>
             </Box>
             <Typography></Typography>
           </Paper>
