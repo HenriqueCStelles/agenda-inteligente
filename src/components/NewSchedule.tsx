@@ -16,6 +16,15 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
 
+type ScheduleMethod = "manual" | "whatsapp";
+
+type ScheduleStatus =
+  | "confirmado"
+  | "pendente"
+  | "semResposta"
+  | "aguardando"
+  | "cancelado";
+
 type addScheduleProps = {
   addSchedule: (
     customer: string,
@@ -23,6 +32,8 @@ type addScheduleProps = {
     date: string,
     time: string,
     notes: string,
+    method: ScheduleMethod,
+    status: ScheduleStatus,
   ) => Promise<void>;
   updateSchedule: (
     id: string,
@@ -31,6 +42,8 @@ type addScheduleProps = {
     date: string,
     time: string,
     notes: string,
+    method: ScheduleMethod,
+    status: ScheduleStatus,
   ) => Promise<void>;
   editingSchedule: Schedule | null;
   open: boolean;
@@ -62,6 +75,10 @@ function NewSchedule({
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
+  const [method, setMethod] = useState<"manual" | "whatsapp">("manual");
+  const [status, setStatus] = useState<
+    "confirmado" | "pendente" | "semResposta" | "aguardando" | "cancelado"
+  >("pendente");
 
   useEffect(() => {
     async function fetchData() {
@@ -113,8 +130,10 @@ function NewSchedule({
       setNotes(editingSchedule.notes);
     } else {
       resetFields();
+      setMethod("manual");
+      setStatus("pendente");
     }
-  }, [editingSchedule]);
+  }, [editingSchedule, open]);
 
   async function handleSave() {
     if (!selectedService.trim() || !date.trim() || !time.trim()) {
@@ -129,9 +148,19 @@ function NewSchedule({
           date,
           time,
           notes,
+          method,
+          status,
         );
       } else {
-        await addSchedule(selectedCustomer, selectedService, date, time, notes);
+        await addSchedule(
+          selectedCustomer,
+          selectedService,
+          date,
+          time,
+          notes,
+          method,
+          status,
+        );
       }
       resetFields();
       onClose();

@@ -36,6 +36,13 @@ export type Schedule = {
   date: string;
   time: string;
   notes: string;
+  method: "manual" | "whatsapp";
+  status:
+    | "confirmado"
+    | "pendente"
+    | "semResposta"
+    | "aguardando"
+    | "cancelado";
 };
 
 function Agendamentos() {
@@ -68,6 +75,33 @@ function Agendamentos() {
     },
   };
 
+  const statusStyles = {
+    confirmado: {
+      backgroundColor: "#dcfce7",
+      color: "#166534",
+    },
+
+    pendente: {
+      backgroundColor: "#fef3c7",
+      color: "#92400e",
+    },
+
+    semResposta: {
+      backgroundColor: "#e5e7eb",
+      color: "#374151",
+    },
+
+    aguardando: {
+      backgroundColor: "#dbeafe",
+      color: "#1d4ed8",
+    },
+
+    cancelado: {
+      backgroundColor: "#fee2e2",
+      color: "#b91c1c",
+    },
+  };
+
   useEffect(() => {
     async function fetchSchedule() {
       try {
@@ -96,6 +130,13 @@ function Agendamentos() {
     date: string,
     time: string,
     notes: string,
+    method: "manual" | "whatsapp",
+    status:
+      | "confirmado"
+      | "pendente"
+      | "semResposta"
+      | "aguardando"
+      | "cancelado",
   ) {
     try {
       const user = auth.currentUser;
@@ -108,6 +149,8 @@ function Agendamentos() {
         date,
         time,
         notes,
+        method,
+        status,
         userId: user.uid,
       });
       const newSchedule = {
@@ -117,6 +160,8 @@ function Agendamentos() {
         date,
         time,
         notes,
+        method,
+        status,
         userId: user.uid,
       };
       setSchedule((prev) => [...prev, newSchedule]);
@@ -133,14 +178,38 @@ function Agendamentos() {
     date: string,
     time: string,
     notes: string,
+    method: "manual" | "whatsapp",
+    status:
+      | "confirmado"
+      | "pendente"
+      | "semResposta"
+      | "aguardando"
+      | "cancelado",
   ) {
     try {
       const scheduleRef = doc(db, "schedules", id);
-      await updateDoc(scheduleRef, { customer, service, date, time, notes });
+      await updateDoc(scheduleRef, {
+        customer,
+        service,
+        date,
+        time,
+        notes,
+        method,
+        status,
+      });
       setSchedule((prev) =>
         prev.map((schedule) =>
           schedule.id === id
-            ? { ...schedule, customer, service, date, time, notes }
+            ? {
+                ...schedule,
+                customer,
+                service,
+                date,
+                time,
+                notes,
+                method,
+                status,
+              }
             : schedule,
         ),
       );
@@ -167,10 +236,12 @@ function Agendamentos() {
   }
 
   function handleOpen() {
+    setEditingSchedule(null);
     setOpenDialog(true);
   }
 
   function handleClose() {
+    setEditingSchedule(null);
     setOpenDialog(false);
   }
 
@@ -315,11 +386,37 @@ function Agendamentos() {
                           </Box>
                         </Box>
                         <Box sx={{ width: 1200 }}>
-                          <Typography
-                            sx={{ fontSize: 20, fontWeight: 550, mb: "4px" }}
-                          >
-                            {schedule.customer}
-                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <Typography
+                                sx={{
+                                  fontSize: 20,
+                                  fontWeight: 550,
+                                }}
+                              >
+                                {schedule.customer}
+                              </Typography>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                px: 1,
+                                borderRadius: 4,
+                                ...statusStyles[schedule.status],
+                              }}
+                            >
+                              <Typography
+                                sx={{ fontSize: 14, fontWeight: 600 }}
+                              >
+                                {schedule.status === "semResposta"
+                                  ? "Sem Resposta"
+                                  : schedule.status.charAt(0).toUpperCase() +
+                                    schedule.status.slice(1)}
+                              </Typography>
+                            </Box>
+                          </Box>
                           <Typography
                             sx={{ color: "#6b7280", fontSize: 15, mb: "4px" }}
                           >
@@ -337,6 +434,26 @@ function Agendamentos() {
                               📌 {schedule.notes}
                             </Typography>
                           )}
+                          <Box
+                            sx={{
+                              mt: 1,
+                              backgroundColor: "#f3f4f6",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 2,
+                              fontSize: 13,
+                              fontWeight: 600,
+                            }}
+                          >
+                            <Typography sx={{ color: "#6b7280", fontSize: 14 }}>
+                              {schedule.method === "whatsapp"
+                                ? "📱 WhatsApp"
+                                : "✍️ Manual"}
+                            </Typography>
+                          </Box>
                         </Box>
                         <Box
                           sx={{

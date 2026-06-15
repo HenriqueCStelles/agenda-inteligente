@@ -135,10 +135,12 @@ function Clientes() {
   }
 
   function handleOpen() {
+    setEditingCustomer(null);
     setOpenDialog(true);
   }
 
   function handleClose() {
+    setEditingCustomer(null);
     setOpenDialog(false);
   }
 

@@ -135,10 +135,12 @@ function Servicos() {
   }
 
   function handleOpen() {
+    setEditingService(null);
     setOpenDialog(true);
   }
 
   function handleClose() {
+    setEditingService(null);
     setOpenDialog(false);
   }
 
