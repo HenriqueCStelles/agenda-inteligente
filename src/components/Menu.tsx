@@ -22,11 +22,32 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { signOut } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
 
 function Menu() {
+  const [appName, setAppName] = useState("Agenda Inteligente");
+  const [logoUrl, setLogoUrl] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function loadBranding() {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const docSnap = await getDoc(
+        doc(db, "users", user.uid, "settings", "branding"),
+      );
+
+      if (docSnap.exists()) {
+        setAppName(docSnap.data().appName || "Agenda Inteligente");
+      }
+    }
+
+    loadBranding();
+  }, []);
 
   async function handleLogout() {
     try {
@@ -106,14 +127,23 @@ function Menu() {
               justifyContent: "center",
             }}
           >
-            <CalendarTodayOutlinedIcon sx={{ color: "#ffff" }} />
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Logo"
+                style={{
+                  width: 40,
+                  height: 40,
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <CalendarTodayOutlinedIcon sx={{ color: "#fff" }} />
+            )}
           </Box>
           <Box sx={{ paddingLeft: "10px" }}>
-            <Typography sx={{ fontWeight: 600, fontSize: 20 }}>
-              Agenda
-            </Typography>
-            <Typography sx={{ fontWeight: 600, fontSize: 20 }}>
-              Inteligente
+            <Typography sx={{ fontWeight: 600, fontSize: 20, lineHeight: 1.2 }}>
+              {appName}
             </Typography>
           </Box>
         </Box>

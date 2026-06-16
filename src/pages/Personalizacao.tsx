@@ -1,9 +1,63 @@
 import Menu from "../components/Menu";
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
+import { auth, db } from "../components/firebase";
+import { useEffect, useState } from "react";
 
 function Personalizacao() {
+  const [appName, setAppName] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const docRef = doc(db, "users", user.uid, "settings", "branding");
+
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+
+          setAppName(data.appName || "");
+          setLogoUrl(data.logoUrl || "");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadSettings();
+  }, []);
+
+  async function saveAppName() {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      setLoading(true);
+
+      await setDoc(
+        doc(db, "users", user.uid, "settings", "branding"),
+        {
+          appName,
+        },
+        { merge: true },
+      );
+
+      alert("Nome salvo com sucesso!");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <Box sx={{ display: "flex" }}>
       <Box>
@@ -125,6 +179,8 @@ function Personalizacao() {
                   Nome da empresa
                 </Typography>
                 <TextField
+                  value={appName}
+                  onChange={(e) => setAppName(e.target.value)}
                   sx={{
                     width: "100%",
                     "& .MuiOutlinedInput-root": {
@@ -149,6 +205,8 @@ function Personalizacao() {
               </Box>
             </Box>
             <Button
+              onClick={saveAppName}
+              disabled={loading}
               sx={{
                 color: "#ffffff",
                 backgroundColor: "#000",

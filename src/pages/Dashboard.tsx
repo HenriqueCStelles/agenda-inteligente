@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Typography } from "@mui/material";
+import { Box, Button, IconButton, Paper, Typography } from "@mui/material";
 import Menu from "../components/Menu";
 
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
@@ -7,10 +7,63 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth, db } from "../components/firebase";
+import { MessageSquare } from "lucide-react";
+
+type Schedule = {
+  id: string;
+  customer: string;
+  service: string;
+  date: string;
+  time: string;
+  notes: string;
+  method: "manual" | "whatsapp";
+  status:
+    | "confirmado"
+    | "pendente"
+    | "semResposta"
+    | "aguardando"
+    | "cancelado";
+};
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [schedule, setSchedule] = useState<Schedule[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    async function fetchTodaySchedules() {
+      try {
+        const user = auth.currentUser;
+
+        if (!user) return;
+
+        const today = new Date().toLocaleDateString("en-CA");
+
+        const q = query(
+          collection(db, "schedules"),
+          where("userId", "==", user.uid),
+          where("date", "==", today),
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        const scheduleData: Schedule[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Schedule, "id">),
+        }));
+
+        scheduleData.sort((a, b) => a.time.localeCompare(b.time));
+
+        setSchedule(scheduleData);
+      } catch (error) {
+        console.error("Erro ao buscar agenda:", error);
+      }
+    }
+
+    fetchTodaySchedules();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,6 +90,33 @@ function Dashboard() {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+  };
+
+  const statusStyles = {
+    confirmado: {
+      backgroundColor: "#dcfce7",
+      color: "#166534",
+    },
+
+    pendente: {
+      backgroundColor: "#fef3c7",
+      color: "#92400e",
+    },
+
+    semResposta: {
+      backgroundColor: "#e5e7eb",
+      color: "#374151",
+    },
+
+    aguardando: {
+      backgroundColor: "#dbeafe",
+      color: "#1d4ed8",
+    },
+
+    cancelado: {
+      backgroundColor: "#fee2e2",
+      color: "#b91c1c",
+    },
   };
 
   return (
@@ -120,7 +200,103 @@ function Dashboard() {
           }}
         >
           <Typography sx={{ fontWeight: 550, mb: 2 }}>Agenda do Dia</Typography>
-          <Grid></Grid>
+          {schedule.length === 0 ? (
+            <Paper>
+              <Typography>Nenhum agendamento hoje</Typography>
+            </Paper>
+          ) : (
+            schedule.map((schedule) => (
+              <Paper
+                elevation={0}
+                key={schedule.id}
+                sx={{
+                  padding: 2,
+                  borderRadius: 2,
+                  mb: 2,
+                  mx: 2,
+                  border: "1px solid #e5e5e5",
+                }}
+              >
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      width: "6%",
+                      display: "flex",
+                      justifyContent: "center",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          color: "#000000",
+                          fontSize: 20,
+                          fontWeight: 550,
+                        }}
+                      >
+                        {schedule.time}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ width: 1200 }}>
+                    <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography
+                          sx={{
+                            fontSize: 20,
+                            fontWeight: 550,
+                          }}
+                        >
+                          {schedule.customer}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          px: 1,
+                          borderRadius: 4,
+                          ...statusStyles[schedule.status],
+                        }}
+                      >
+                        <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                          {schedule.status === "semResposta"
+                            ? "Sem Resposta"
+                            : schedule.status.charAt(0).toUpperCase() +
+                              schedule.status.slice(1)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "right",
+                      gap: 1,
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        color: "#000000c0",
+                        border: "1px solid #e5e5e5",
+                        borderRadius: 2,
+                        height: 35,
+                        gap: 1,
+                        fontSize: 15,
+                        fontWeight: 550,
+                      }}
+                    >
+                      <MessageSquare />
+                      Whatsapp
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Paper>
+            ))
+          )}
         </Paper>
         <Paper
           elevation={0}

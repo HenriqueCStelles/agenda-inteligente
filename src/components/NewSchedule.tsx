@@ -328,6 +328,36 @@ function NewSchedule({
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
           />
+          {editingSchedule ? (
+            <Box>
+              <Typography sx={{ ...inputLabel, mt: 2 }}>
+                Atualizar status
+              </Typography>
+              <Select
+                value={editingSchedule.status}
+                onChange={(e) => setStatus(e.target.value as ScheduleStatus)}
+                displayEmpty
+                sx={{
+                  ...inputStyle,
+                  "& .MuiSelect-select": {
+                    padding: "14px",
+                    backgroundColor: "#f3f4f6",
+                  },
+                  borderRadius: "10px",
+                  border: "1px solid #e5e7eb",
+                  height: 40,
+                }}
+              >
+                <MenuItem value="confirmado">Confirmado</MenuItem>
+                <MenuItem value="pendente">Pendente</MenuItem>
+                <MenuItem value="semResposta">Sem Resposta</MenuItem>
+                <MenuItem value="aguardando">Aguardando</MenuItem>
+                <MenuItem value="cancelado">Cancelado</MenuItem>
+              </Select>
+            </Box>
+          ) : (
+            <></>
+          )}
         </Box>
         <Box sx={{ gap: 2, mt: 2, display: "flex", justifyContent: "right" }}>
           <Button
