@@ -31,6 +31,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState<Schedule[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [allSchedules, setAllSchedules] = useState<Schedule[]>([]);
 
   useEffect(() => {
     async function fetchTodaySchedules() {
@@ -66,11 +67,49 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    async function fetchAllSchedules() {
+      const user = auth.currentUser;
+
+      if (!user) return;
+
+      const q = query(
+        collection(db, "schedules"),
+        where("userId", "==", user.uid),
+      );
+
+      const snapshot = await getDocs(q);
+
+      const data: Schedule[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Schedule, "id">),
+      }));
+
+      setAllSchedules(data);
+    }
+
+    fetchAllSchedules();
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDate(new Date());
     }, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  const totalHoje = schedule.length;
+
+  const totalConfirmados = allSchedules.filter(
+    (s) => s.status === "confirmado",
+  ).length;
+
+  const totalSemResposta = allSchedules.filter(
+    (s) => s.status === "semResposta",
+  ).length;
+
+  const totalPendentes = allSchedules.filter(
+    (s) => s.status === "pendente" || s.status === "aguardando",
+  ).length;
 
   const formattedDate = currentDate.toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -152,7 +191,15 @@ function Dashboard() {
                 <CalendarTodayOutlinedIcon sx={{ color: "#6b7280" }} />
               </Box>
             </Box>
-            <Typography></Typography>
+            <Typography
+              sx={{
+                mt: 1,
+                fontSize: 32,
+                fontWeight: 600,
+              }}
+            >
+              {totalHoje}
+            </Typography>
           </Paper>
           <Paper elevation={0} sx={paperStyle}>
             <Box sx={titleBox}>
@@ -163,7 +210,15 @@ function Dashboard() {
                 <CheckCircleOutlineOutlinedIcon sx={{ color: "#00a63e" }} />
               </Box>
             </Box>
-            <Typography></Typography>
+            <Typography
+              sx={{
+                mt: 1,
+                fontSize: 32,
+                fontWeight: 600,
+              }}
+            >
+              {totalConfirmados}
+            </Typography>
           </Paper>
           <Paper elevation={0} sx={paperStyle}>
             <Box sx={titleBox}>
@@ -174,7 +229,15 @@ function Dashboard() {
                 <QueryBuilderIcon sx={{ color: "#f54a00" }} />
               </Box>
             </Box>
-            <Typography></Typography>
+            <Typography
+              sx={{
+                mt: 1,
+                fontSize: 32,
+                fontWeight: 600,
+              }}
+            >
+              {totalSemResposta}
+            </Typography>
           </Paper>
           <Paper elevation={0} sx={paperStyle}>
             <Box sx={titleBox}>
@@ -187,7 +250,15 @@ function Dashboard() {
                 />
               </Box>
             </Box>
-            <Typography></Typography>
+            <Typography
+              sx={{
+                mt: 1,
+                fontSize: 32,
+                fontWeight: 600,
+              }}
+            >
+              {totalPendentes}
+            </Typography>
           </Paper>
         </Box>
         <Paper
@@ -201,7 +272,15 @@ function Dashboard() {
         >
           <Typography sx={{ fontWeight: 550, mb: 2 }}>Agenda do Dia</Typography>
           {schedule.length === 0 ? (
-            <Paper>
+            <Paper
+              sx={{
+                padding: 2,
+                borderRadius: 2,
+                mb: 2,
+                mx: 2,
+                border: "1px solid #e5e5e5",
+              }}
+            >
               <Typography>Nenhum agendamento hoje</Typography>
             </Paper>
           ) : (
@@ -258,7 +337,7 @@ function Dashboard() {
                           alignItems: "center",
                           justifyContent: "center",
                           px: 1,
-                          borderRadius: 4,
+                          borderRadius: 2,
                           ...statusStyles[schedule.status],
                         }}
                       >

@@ -61,9 +61,29 @@ function NewCustomer({
     }
   }, [editingCustomer]);
 
+  function formatPhone(phone: string) {
+    const numbers = phone.replace(/\D/g, "").slice(0, 13);
+
+    if (numbers.length <= 2) {
+      return numbers;
+    }
+
+    if (numbers.length <= 8) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    }
+
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(
+      2,
+      8,
+    )}-${numbers.slice(8)}`;
+  }
+
   async function handleSave() {
     if (!name.trim() || !number.trim() || !email.trim()) {
       return alert("Preencha todos os campos!");
+    }
+    if (number.length !== 13) {
+      return alert("O telefone deve conter 13 dígitos.");
     }
     try {
       if (editingCustomer) {
@@ -144,9 +164,14 @@ function NewCustomer({
             variant="outlined"
             placeholder="(00)00000-0000"
             required
-            slotProps={{ htmlInput: { maxLength: 13 } }}
-            value={number}
-            onChange={(event) => setNumber(event.target.value)}
+            value={formatPhone(number)}
+            onChange={(event) => {
+              const numbers = event.target.value
+                .replace(/\D/g, "")
+                .slice(0, 13);
+
+              setNumber(numbers);
+            }}
           />
           <Typography sx={inputLabel}>Email</Typography>
           <TextField

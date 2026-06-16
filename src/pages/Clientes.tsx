@@ -39,6 +39,27 @@ function Clientes() {
   const [customer, setCustomer] = useState<Customer[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [search, setSearch] = useState("");
+
+  function formatPhone(phone: string) {
+    const numbers = phone.replace(/\D/g, "");
+
+    if (numbers.length === 11) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(
+        2,
+        7,
+      )}-${numbers.slice(7)}`;
+    }
+
+    if (numbers.length === 13) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(
+        2,
+        6,
+      )}-${numbers.slice(6)}`;
+    }
+
+    return phone;
+  }
 
   useEffect(() => {
     async function fetchCustomer() {
@@ -144,6 +165,15 @@ function Clientes() {
     setOpenDialog(false);
   }
 
+  const filteredCustomers = customer.filter((customer) => {
+    const term = search.toLowerCase().trim();
+
+    return (
+      customer.name.toLowerCase().includes(term) ||
+      customer.number.includes(term)
+    );
+  });
+
   const inputStyle = {
     mb: 2,
     width: "100%",
@@ -239,11 +269,13 @@ function Clientes() {
                   },
                 }}
                 placeholder="Buscar por nome ou telefone..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
             </Box>
             <Box sx={{ paddingBottom: 1 }}>
               <Grid>
-                {customer.map((customer) => (
+                {filteredCustomers.map((customer) => (
                   <Grid key={customer.id}>
                     <Paper
                       sx={{
@@ -278,7 +310,7 @@ function Clientes() {
                           <Typography
                             sx={{ color: "#6b7280", fontSize: 15, mb: "4px" }}
                           >
-                            📞 {customer.number}
+                            📞 {formatPhone(customer.number)}
                           </Typography>
                           <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
                             ✉️ {customer.email}

@@ -110,7 +110,15 @@ function DailyList() {
         Agendamentos - {formattedDate}
       </Typography>
       {schedule.length === 0 ? (
-        <Paper>
+        <Paper
+          sx={{
+            padding: 2,
+            borderRadius: 2,
+            mb: 2,
+            mx: 2,
+            border: "1px solid #e5e5e5",
+          }}
+        >
           <Typography>Nenhum agendamento hoje</Typography>
         </Paper>
       ) : (
@@ -175,7 +183,7 @@ function DailyList() {
                       alignItems: "center",
                       justifyContent: "center",
                       px: 1,
-                      borderRadius: 4,
+                      borderRadius: 2,
                       ...statusStyles[schedule.status],
                     }}
                   >

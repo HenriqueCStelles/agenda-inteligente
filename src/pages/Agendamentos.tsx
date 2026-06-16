@@ -50,6 +50,8 @@ function Agendamentos() {
   const [openDialog, setOpenDialog] = useState(false);
   const [schedule, setSchedule] = useState<Schedule[]>([]);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+  const [search, setSearch] = useState("");
+
   const inputStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
@@ -245,6 +247,15 @@ function Agendamentos() {
     setOpenDialog(false);
   }
 
+  const filteredSchedules = schedule.filter((schedule) => {
+    const term = search.toLowerCase().trim();
+
+    return (
+      schedule.customer.toLowerCase().includes(term) ||
+      schedule.service.includes(term)
+    );
+  });
+
   return (
     <Box sx={{ display: "flex" }}>
       <Box>
@@ -314,6 +325,8 @@ function Agendamentos() {
                   },
                 }}
                 placeholder="Buscar por cliente ou horário..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
               <Select
                 defaultValue=""
@@ -342,7 +355,7 @@ function Agendamentos() {
             </Box>
             <Box sx={{ paddingBottom: 1 }}>
               <Grid>
-                {schedule.map((schedule) => (
+                {filteredSchedules.map((schedule) => (
                   <Grid key={schedule.id}>
                     <Paper
                       sx={{
@@ -371,7 +384,6 @@ function Agendamentos() {
                             >
                               {schedule.date}
                             </Typography>
-
                             <Typography
                               sx={{
                                 display: "flex",
@@ -403,7 +415,7 @@ function Agendamentos() {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 px: 1,
-                                borderRadius: 4,
+                                borderRadius: 2,
                                 ...statusStyles[schedule.status],
                               }}
                             >
