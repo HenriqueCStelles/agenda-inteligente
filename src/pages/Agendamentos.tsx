@@ -21,6 +21,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   updateDoc,
@@ -190,13 +191,15 @@ function Agendamentos() {
   ) {
     try {
       const scheduleRef = doc(db, "schedules", id);
+      const scheduleSnap = await getDoc(scheduleRef);
+      const currentMethod = scheduleSnap.data()?.method;
       await updateDoc(scheduleRef, {
         customer,
         service,
         date,
         time,
         notes,
-        method,
+        method: currentMethod,
         status,
       });
       setSchedule((prev) =>
@@ -209,7 +212,7 @@ function Agendamentos() {
                 date,
                 time,
                 notes,
-                method,
+                method: currentMethod,
                 status,
               }
             : schedule,
@@ -263,11 +266,9 @@ function Agendamentos() {
       </Box>
       <Box
         sx={{
-          marginLeft: 0,
-          marginRight: 0,
-          paddingTop: 4,
-          paddingLeft: 3,
-          paddingRight: 3,
+          ml: "255px",
+          pt: 4,
+          px: 3,
           width: "100%",
         }}
       >

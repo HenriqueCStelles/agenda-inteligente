@@ -122,6 +122,23 @@ function Register() {
     }
   };
 
+  function formatPhone(phone: string) {
+    const numbers = phone.replace(/\D/g, "").slice(0, 13);
+
+    if (numbers.length <= 2) {
+      return numbers;
+    }
+
+    if (numbers.length <= 8) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    }
+
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(
+      2,
+      8,
+    )}-${numbers.slice(8)}`;
+  }
+
   const inputStyle = {
     mb: 2,
     width: "100%",
@@ -159,22 +176,26 @@ function Register() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        py: 4,
+        px: 2,
       }}
     >
       <Container
+        maxWidth="sm"
         sx={{
           justifyContent: "center",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          px: { xs: 0, sm: 2 },
         }}
       >
         <Paper
           sx={{
             width: "100%",
             maxWidth: "520px",
-            padding: "30px",
-            borderRadius: "24px",
+            p: { xs: 3, sm: 4 },
+            borderRadius: { xs: "18px", sm: "24px" },
             backgroundColor: "#fff",
             boxShadow: "0 18px 40px rgba(0, 0, 0, 0.12)",
           }}
@@ -192,32 +213,46 @@ function Register() {
               sx={{
                 backgroundColor: "#3b82f6",
                 borderRadius: "14px",
-                width: "52px",
-                height: "52px",
+                width: { xs: "46px", sm: "52px" },
+                height: { xs: "46px", sm: "52px" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 mb: 2,
               }}
             >
-              <CalendarTodayOutlinedIcon sx={{ color: "#ffff" }} />
+              <CalendarTodayOutlinedIcon sx={{ color: "#fff" }} />
             </Box>
+
             <Typography
               sx={{
                 textAlign: "center",
-                fontSize: "32px",
+                fontSize: { xs: "26px", sm: "32px" },
                 color: "#111827",
                 fontWeight: 550,
               }}
             >
               Agenda Inteligente
             </Typography>
+
             <Typography
-              sx={{ fontSize: "15px", color: "#6b7280", textAlign: "center" }}
+              sx={{
+                fontSize: { xs: "14px", sm: "15px" },
+                color: "#6b7280",
+                textAlign: "center",
+                px: 1,
+              }}
             >
               Sistema de gestão de agendamentos com automação via WhatsApp
             </Typography>
-            <Typography sx={{ mt: 3, fontWeight: 550, fontSize: 20 }}>
+
+            <Typography
+              sx={{
+                mt: 3,
+                fontWeight: 550,
+                fontSize: { xs: 18, sm: 20 },
+              }}
+            >
               Criar Conta
             </Typography>
           </Box>
@@ -251,10 +286,14 @@ function Register() {
             <TextField
               sx={inputStyle}
               variant="outlined"
-              placeholder="(99)99999-9999"
-              slotProps={{ htmlInput: { maxLength: 13 } }}
-              value={number}
-              onChange={(event) => setNumber(event.target.value)}
+              placeholder="(99) 99999-9999"
+              value={formatPhone(number)}
+              onChange={(event) => {
+                const numbers = event.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 13);
+                setNumber(numbers);
+              }}
             />
             <Typography sx={inputLabel}>
               Tipo de Serviço/Área de Atuação

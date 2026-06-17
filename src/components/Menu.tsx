@@ -105,6 +105,10 @@ function Menu() {
       sx={{
         width: "255px",
         height: "100vh",
+        position: "fixed",
+        left: 0,
+        top: 0,
+        zIndex: 1000,
       }}
     >
       <Paper

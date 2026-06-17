@@ -7,7 +7,13 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import { auth, db } from "../components/firebase";
 import { MessageSquare } from "lucide-react";
 
@@ -27,11 +33,20 @@ type Schedule = {
     | "cancelado";
 };
 
+type Request = {
+  id: string;
+  customer: string;
+  type: "agendamento" | "remarcacao";
+  status: "pendente" | "aprovada" | "recusada";
+  createdAt: Timestamp;
+};
+
 function Dashboard() {
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState<Schedule[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [allSchedules, setAllSchedules] = useState<Schedule[]>([]);
+  const [requests, setRequests] = useState<Request[]>([]);
 
   useEffect(() => {
     async function fetchTodaySchedules() {
@@ -64,6 +79,35 @@ function Dashboard() {
     }
 
     fetchTodaySchedules();
+  }, []);
+
+  useEffect(() => {
+    async function fetchRequests() {
+      try {
+        const user = auth.currentUser;
+
+        if (!user) return;
+
+        const q = query(
+          collection(db, "requests"),
+          where("userId", "==", user.uid),
+          where("status", "==", "pendente"),
+        );
+
+        const snapshot = await getDocs(q);
+
+        const data: Request[] = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Request, "id">),
+        }));
+
+        setRequests(data);
+      } catch (error) {
+        console.error("Erro ao buscar solicitações:", error);
+      }
+    }
+
+    fetchRequests();
   }, []);
 
   useEffect(() => {
@@ -165,11 +209,9 @@ function Dashboard() {
       </Box>
       <Box
         sx={{
-          marginLeft: 0,
-          marginRight: 0,
-          paddingTop: 4,
-          paddingLeft: 3,
-          paddingRight: 3,
+          ml: "255px",
+          pt: 4,
+          px: 3,
           width: "100%",
         }}
       >
@@ -377,6 +419,7 @@ function Dashboard() {
             ))
           )}
         </Paper>
+
         <Paper
           elevation={0}
           sx={{
@@ -412,6 +455,52 @@ function Dashboard() {
               </Button>
             </Box>
           </Box>
+          {requests.length === 0 ? (
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                border: "1px solid #e5e5e5",
+                borderRadius: 2,
+              }}
+            >
+              <Typography color="#6b7280">
+                Nenhuma solicitação pendente.
+              </Typography>
+            </Paper>
+          ) : (
+            requests.slice(0, 3).map((request) => (
+              <Paper
+                key={request.id}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  mb: 2,
+                  border: "1px solid #bedbff",
+                  borderRadius: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box>
+                  <Typography sx={{ fontWeight: 550 }}>
+                    {request.type === "agendamento"
+                      ? "Novo agendamento"
+                      : "Remarcação"}{" "}
+                    - {request.customer}
+                  </Typography>
+                  <Typography sx={{ color: "#6b7280", fontSize: 14 }}>
+                    {request.createdAt?.toDate().toLocaleDateString("pt-BR")} às{" "}
+                    {request.createdAt?.toDate().toLocaleTimeString("pt-BR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Typography>
+                </Box>
+              </Paper>
+            ))
+          )}
         </Paper>
       </Box>
     </Box>

@@ -61,10 +61,12 @@ function Solicitacoes() {
   }, []);
 
   async function approveRequest(request: Request) {
+    const [day, month, year] = request.desiredDate.split("/");
+    const formattedDate = `${year}-${month}-${day}`;
     await addDoc(collection(db, "schedules"), {
       customer: request.customer,
       service: request.service,
-      date: request.desiredDate,
+      date: formattedDate,
       time: request.desiredTime,
       notes: request.message,
       method: "whatsapp",
@@ -75,12 +77,26 @@ function Solicitacoes() {
     await updateDoc(doc(db, "requests", request.id), {
       status: "aprovada",
     });
+
+    setRequests((prev) => prev.filter((r) => r.id !== request.id));
   }
 
   async function rejectRequest(requestId: string) {
     await updateDoc(doc(db, "requests", requestId), {
       status: "recusada",
     });
+
+    setRequests((prev) => prev.filter((r) => r.id !== requestId));
+  }
+
+  function formatPhone(phone: string) {
+    const numbers = phone.replace(/\D/g, "");
+
+    if (numbers.length === 11) {
+      return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
+
+    return phone;
   }
 
   return (
@@ -90,11 +106,9 @@ function Solicitacoes() {
       </Box>
       <Box
         sx={{
-          marginLeft: 0,
-          marginRight: 0,
-          paddingTop: 4,
-          paddingLeft: 3,
-          paddingRight: 3,
+          ml: "255px",
+          pt: 4,
+          px: 3,
           width: "100%",
         }}
       >
@@ -141,7 +155,13 @@ function Solicitacoes() {
                       Nova Solicitação de Agendamento
                     </Typography>
                     <Typography sx={{ color: "#6b7280", fontSize: 15 }}>
-                      Recebido em 20/03/2026 às 14:30
+                      Recebido em{" "}
+                      {request.createdAt?.toDate().toLocaleDateString("pt-BR")}{" "}
+                      às{" "}
+                      {request.createdAt?.toDate().toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Typography>
                   </Box>
                 </Box>
@@ -162,12 +182,12 @@ function Solicitacoes() {
                   <Box sx={{ display: "flex" }}>
                     <Box sx={{ width: "50%" }}>
                       <Typography sx={{ fontSize: 15, color: "#6b7280" }}>
-                        Cliente:
+                        Cliente: <strong>{request.customer}</strong>
                       </Typography>
                     </Box>
                     <Box sx={{ width: "50%" }}>
                       <Typography sx={{ fontSize: 15, color: "#6b7280" }}>
-                        Telefone:
+                        Telefone: <strong>{formatPhone(request.phone)}</strong>
                       </Typography>
                     </Box>
                   </Box>
@@ -189,23 +209,24 @@ function Solicitacoes() {
                   <Box sx={{ display: "flex", mb: 3 }}>
                     <Box sx={{ width: "33%" }}>
                       <Typography sx={{ fontSize: 15, color: "#6b7280" }}>
-                        Serviço:
+                        Serviço: <strong>{request.service}</strong>
                       </Typography>
                     </Box>
                     <Box sx={{ width: "33%" }}>
                       <Typography sx={{ fontSize: 15, color: "#6b7280" }}>
-                        Data desejada:
+                        Data desejada: <strong>{request.desiredDate}</strong>
                       </Typography>
                     </Box>
                     <Box sx={{ width: "33%" }}>
                       <Typography sx={{ fontSize: 15, color: "#6b7280" }}>
-                        Horário desejado:
+                        Horário desejado: <strong>{request.desiredTime}</strong>
                       </Typography>
                     </Box>
                   </Box>
                   <Box>
                     <Typography sx={{ fontSize: 15, color: "#6b7280" }}>
-                      Mensagem do cliente:
+                      Mensagem do cliente:{" "}
+                      <strong>{request.message || "Nenhuma observação"}</strong>
                     </Typography>
                   </Box>
                 </Paper>

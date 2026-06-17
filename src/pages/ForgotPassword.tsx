@@ -49,22 +49,26 @@ function ForgotPassword() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        py: 4,
+        px: 2,
       }}
     >
       <Container
+        maxWidth="sm"
         sx={{
           justifyContent: "center",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          px: { xs: 0, sm: 2 },
         }}
       >
         <Paper
           sx={{
             width: "100%",
             maxWidth: "420px",
-            padding: "30px",
-            borderRadius: "24px",
+            p: { xs: 3, sm: 4 },
+            borderRadius: { xs: "18px", sm: "24px" },
             backgroundColor: "#fff",
             boxShadow: "0 18px 40px rgba(0, 0, 0, 0.12)",
           }}
@@ -82,20 +86,20 @@ function ForgotPassword() {
               sx={{
                 backgroundColor: "#3b82f6",
                 borderRadius: "14px",
-                width: "52px",
-                height: "52px",
+                width: { xs: "46px", sm: "52px" },
+                height: { xs: "46px", sm: "52px" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 mb: 2,
               }}
             >
-              <CalendarTodayOutlinedIcon sx={{ color: "#ffff" }} />
+              <CalendarTodayOutlinedIcon sx={{ color: "#fff" }} />
             </Box>
             <Typography
               sx={{
                 textAlign: "center",
-                fontSize: "32px",
+                fontSize: { xs: "26px", sm: "32px" },
                 color: "#111827",
                 fontWeight: 550,
               }}

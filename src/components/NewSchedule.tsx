@@ -128,6 +128,7 @@ function NewSchedule({
       setDate(editingSchedule.date);
       setTime(editingSchedule.time);
       setNotes(editingSchedule.notes);
+      setStatus(editingSchedule.status);
     } else {
       resetFields();
       setMethod("manual");
@@ -334,7 +335,7 @@ function NewSchedule({
                 Atualizar status
               </Typography>
               <Select
-                value={editingSchedule.status}
+                value={status}
                 onChange={(e) => setStatus(e.target.value as ScheduleStatus)}
                 displayEmpty
                 sx={{

@@ -65,11 +65,9 @@ function Personalizacao() {
       </Box>
       <Box
         sx={{
-          marginLeft: 0,
-          marginRight: 0,
-          paddingTop: 4,
-          paddingLeft: 3,
-          paddingRight: 3,
+          ml: "255px",
+          pt: 4,
+          px: 3,
           width: "100%",
         }}
       >
