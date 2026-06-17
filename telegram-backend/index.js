@@ -1,35 +1,47 @@
-const express = require("express");
-const cors = require("cors");
-const admin = require("firebase-admin");
+const TelegramBot = require("node-telegram-bot-api");
+
+const { initializeApp, cert } = require("firebase-admin/app");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
 const serviceAccount = require("./serviceAccountKey.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+initializeApp({
+  credential: cert(serviceAccount),
 });
 
-const db = admin.firestore();
+const db = getFirestore();
 
-const app = express();
+const TOKEN = "SEU_TOKEN_AQUI";
 
-app.use(cors());
-app.use(express.json());
+const bot = new TelegramBot(TOKEN, {
+  polling: true,
+});
 
-app.post("/telegram", async (req, res) => {
+console.log("Bot iniciado...");
+
+bot.on("message", async (msg) => {
   try {
-    const message = req.body.message;
+    const text = msg.text || "";
 
-    if (!message) {
-      return res.sendStatus(200);
+    // comando inicial
+    if (text === "/start") {
+      await bot.sendMessage(
+        msg.chat.id,
+        "Olá! 👋\n\n" +
+          "Para solicitar um agendamento, envie:\n\n" +
+          "Nome:\n" +
+          "Serviço:\n" +
+          "Data:\n" +
+          "Horário:\n" +
+          "Mensagem:",
+      );
+
+      return;
     }
 
-    const customer = message.from.first_name;
-    const phone = String(message.chat.id);
-    const text = message.text || "";
-
     await db.collection("requests").add({
-      customer,
-      phone,
+      customer: msg.from.first_name,
+      phone: String(msg.chat.id),
       service: "",
       desiredDate: "",
       desiredTime: "",
@@ -37,20 +49,14 @@ app.post("/telegram", async (req, res) => {
       type: "agendamento",
       status: "pendente",
       userId: "eY7yOUfZq9fJRlgdzRkr6RLIAG22",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
-    res.sendStatus(200);
+    await bot.sendMessage(
+      msg.chat.id,
+      "Solicitação recebida! ✅\n\nEm breve entraremos em contato.",
+    );
   } catch (error) {
     console.error(error);
-    res.sendStatus(500);
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("Servidor funcionando");
-});
-
-app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000");
 });
