@@ -220,7 +220,7 @@ function Solicitacoes() {
                       borderRadius: 2,
                       textTransform: "none",
                     }}
-                    onClick={() => approveRequest}
+                    onClick={() => approveRequest(request)}
                   >
                     <CheckCircleOutlineOutlinedIcon sx={{ fontSize: 24 }} />
                     Aprovar Solicitação
@@ -235,7 +235,7 @@ function Solicitacoes() {
                       gap: 1,
                       textTransform: "none",
                     }}
-                    onClick={() => rejectRequest}
+                    onClick={() => rejectRequest(request.id)}
                   >
                     <CancelOutlinedIcon sx={{ fontSize: 24 }} />
                     Recusar
