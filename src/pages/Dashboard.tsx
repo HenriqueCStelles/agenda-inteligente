@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import Menu from "../components/Menu";
 
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
@@ -15,7 +15,6 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../components/firebase";
-import { MessageSquare } from "lucide-react";
 
 type Schedule = {
   id: string;
@@ -391,28 +390,6 @@ function Dashboard() {
                         </Typography>
                       </Box>
                     </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "right",
-                      gap: 1,
-                    }}
-                  >
-                    <IconButton
-                      sx={{
-                        color: "#000000c0",
-                        border: "1px solid #e5e5e5",
-                        borderRadius: 2,
-                        height: 35,
-                        gap: 1,
-                        fontSize: 15,
-                        fontWeight: 550,
-                      }}
-                    >
-                      <MessageSquare />
-                      Whatsapp
-                    </IconButton>
                   </Box>
                 </Box>
               </Paper>

@@ -3,7 +3,6 @@ import Menu from "../components/Menu";
 
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import {
   addDoc,
@@ -260,23 +259,6 @@ function Solicitacoes() {
                   >
                     <CancelOutlinedIcon sx={{ fontSize: 24 }} />
                     Recusar
-                  </Button>
-                  <Button
-                    sx={{
-                      color: "#000",
-                      fontWeight: 550,
-                      border: "1px solid #e5e5e5",
-                      borderRadius: 2,
-                      fontSize: 15,
-                      gap: 1,
-                      textTransform: "none",
-                    }}
-                    onClick={() =>
-                      window.open(`https://wa.me/${request.phone}`, "_blank")
-                    }
-                  >
-                    <ChatBubbleOutlineOutlinedIcon sx={{ fontSize: 24 }} />
-                    Abrir WhatsApp
                   </Button>
                 </Box>
               </Paper>

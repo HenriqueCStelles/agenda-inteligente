@@ -28,7 +28,7 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../components/firebase";
-import { MessageSquare, SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2 } from "lucide-react";
 
 export type Schedule = {
   id: string;
@@ -398,7 +398,7 @@ function Agendamentos() {
                             </Typography>
                           </Box>
                         </Box>
-                        <Box sx={{ width: 1200 }}>
+                        <Box sx={{ width: 1200, flexGrow: 1 }}>
                           <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
                             <Box sx={{ display: "flex", alignItems: "center" }}>
                               <Typography
@@ -475,20 +475,6 @@ function Agendamentos() {
                             gap: 1,
                           }}
                         >
-                          <IconButton
-                            sx={{
-                              color: "#000000c0",
-                              border: "1px solid #e5e5e5",
-                              borderRadius: 2,
-                              height: 35,
-                              gap: 1,
-                              fontSize: 15,
-                              fontWeight: 550,
-                            }}
-                          >
-                            <MessageSquare />
-                            Whatsapp
-                          </IconButton>
                           <IconButton
                             sx={{
                               color: "#000000c0",

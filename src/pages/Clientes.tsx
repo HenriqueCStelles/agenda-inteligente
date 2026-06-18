@@ -24,7 +24,7 @@ import {
   where,
 } from "firebase/firestore";
 import NewCustomer from "../components/NewCustomer";
-import { MessageSquare, SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2 } from "lucide-react";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 export type Customer = {
@@ -299,7 +299,7 @@ function Clientes() {
                         >
                           <PersonOutlinedIcon sx={{ fontSize: 30 }} />
                         </Box>
-                        <Box sx={{ width: 1200 }}>
+                        <Box sx={{ width: 1200, flexGrow: 1 }}>
                           <Typography
                             sx={{ fontSize: 20, fontWeight: 550, mb: "4px" }}
                           >
@@ -337,20 +337,6 @@ function Clientes() {
                             gap: 1,
                           }}
                         >
-                          <IconButton
-                            sx={{
-                              color: "#000000c0",
-                              border: "1px solid #e5e5e5",
-                              borderRadius: 2,
-                              height: 35,
-                              gap: 1,
-                              fontSize: 15,
-                              fontWeight: 550,
-                            }}
-                          >
-                            <MessageSquare />
-                            Whatsapp
-                          </IconButton>
                           <IconButton
                             sx={{
                               color: "#000000c0",
